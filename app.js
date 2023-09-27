@@ -36,7 +36,14 @@ const getFilmById = (req, res) => {
     if (error) {
       throw error
     }
-    res.status(200).json(results.rows)
+    console.log("Result rows :", results.rowCount);
+    if(results.rowCount == 0){
+      let message = `Film with ID ${id} not found.`;
+      console.log(message);
+      res.status(404).send(message);
+    } else {
+      res.status(200).json(results.rows)
+    }
   })
 }
 
