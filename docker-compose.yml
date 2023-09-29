@@ -1,0 +1,28 @@
+version: "3.8"  # optional since v1.27.0
+services:
+  postgresql_api:
+    container_name: "postgresql-api"
+    image: "rehanalimahomed/postgresql-api"
+    depends_on:
+      - postgresql_db
+    ports:
+      - "8080:8080"
+    networks:
+      - default
+    command: "npm start"
+  postgresql_db:
+    container_name: "postgresql-db"
+    image: "totofunku/sql-cours"
+    ports: 
+      - "5433:5432"
+    volumes:
+       - /home/rt/bigdata-tp1/pg_db:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: adminadmin
+    networks:
+      - default
+networks:
+  default:
+# volumes:
+#   db_persdata : /home/rt/bigdata-tp1/pg_db
