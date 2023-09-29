@@ -10,7 +10,7 @@ app.use(express.json());
 // Define the PostgreSQL DB
 const pool = new Pool({
   user: 'admin',
-  host: 'localhost',
+  host: 'postgresql_db',
   database: 'postgres',
   password: 'adminadmin',
   port: 5432
@@ -22,7 +22,8 @@ const getFilms = (request, response) => {
   
   pool.query('SELECT * FROM film ORDER BY title ASC', (error, results) => {
     if (error) {
-      throw error
+      console.log("An error occured : ", error);
+      response.status(500).send("An error occured while trying to get all films from database");
     }
     response.status(200).json(results.rows)
   })
@@ -30,11 +31,15 @@ const getFilms = (request, response) => {
 
 const getFilmById = (req, res) => {
   const id = parseInt(req.params.id);
+  
+  if(id == undefined) { res.status(404).send("ID not found") }
+  
   console.log("Retrieving film with ID :",id);
 
   pool.query('SELECT * FROM film WHERE film_id = $1', [id], (error, results) => {
     if (error) {
-      throw error
+      console.log("An error occured : ", error);
+      res.status(500).send("An error occured while trying to get film with id :" + id);
     }
     console.log("Result rows :", results.rowCount);
     if(results.rowCount == 0){
@@ -45,15 +50,19 @@ const getFilmById = (req, res) => {
       res.status(200).json(results.rows)
     }
   })
+  
 }
 
 const addFilm = (req, res) => {
   const { name, description } = req.body;
-  console.log("Adding film :"+ name);
+  
+  if(name == undefined || description == undefined) return res.status(404).send("Missing required parameters");
 
+  console.log("Adding film :"+ name);
   pool.query('INSERT INTO film (title, description, language_id) VALUES ($1, $2, 1) RETURNING *', [name, description], (error, results) => {
     if (error) {
-      throw error
+      console.log("An error occured : ", error);
+      res.status(500).send("An error occured while trying to add film to database");
     }
     res.status(201).send(`Film added with ID: ${results.rows[0].film_id}`)
   })
