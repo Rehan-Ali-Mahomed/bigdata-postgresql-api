@@ -1,6 +1,6 @@
 const express = require('express');
 const app = express();
-const port = 8000;
+const port = 8080;
 const Pool = require('pg').Pool;
 
 // Define the middleware to use to parse url
